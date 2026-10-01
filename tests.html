@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>테스트 러너 · US Market Macro Signal</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .t-wrap { max-width: 980px; margin: 0 auto; padding: 24px 16px 60px; }
+    .t-summary { padding: 14px 18px; border-radius: 12px; font-weight: 700; margin: 16px 0; }
+    .t-summary.pass { background: rgba(34,197,94,.15); border: 1px solid #22c55e; color: #86efac; }
+    .t-summary.fail { background: rgba(239,68,68,.15); border: 1px solid #ef4444; color: #fca5a5; }
+    .t-suite { margin: 18px 0 6px; font-weight: 700; color: var(--accent); }
+    .t-row { padding: 6px 10px; border-bottom: 1px solid var(--line); font-size: 14px; display: flex; gap: 8px; }
+    .t-row .ok { color: #22c55e; } .t-row .ng { color: #ef4444; }
+    .t-err { color: #fca5a5; font-size: 13px; padding: 2px 0 8px 26px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <main class="t-wrap">
+    <p><a href="index.html">← 대시보드</a></p>
+    <h1>단위·통합 테스트</h1>
+    <p class="muted">필수 테스트 8개(명세 31) + 지표 점수화 / 가격 필터 / 알림 / 신뢰도 / 실제 데이터 통합 테스트</p>
+    <div id="t-summary" class="t-summary">실행 중…</div>
+    <div id="t-results"></div>
+  </main>
+  <script type="module">
+    import { runAll } from './src/tests/index.js';
+    const res = await runAll();
+    window.__TEST_RESULTS__ = res;
+    const pass = res.filter(r => r.ok).length;
+    const sum = document.getElementById('t-summary');
+    sum.textContent = `${pass} / ${res.length} 통과` + (pass === res.length ? ' ✅' : ` — 실패 ${res.length - pass}`);
+    sum.className = 't-summary ' + (pass === res.length ? 'pass' : 'fail');
+    sum.dataset.pass = pass; sum.dataset.total = res.length;
+    const box = document.getElementById('t-results');
+    let last = '';
+    for (const r of res) {
+      if (r.suite !== last) { const h = document.createElement('div'); h.className = 't-suite'; h.textContent = r.suite; box.appendChild(h); last = r.suite; }
+      const row = document.createElement('div'); row.className = 't-row';
+      row.innerHTML = `<span class="${r.ok ? 'ok' : 'ng'}">${r.ok ? '✔' : '✘'}</span><span></span>`;
+      row.lastChild.textContent = r.name;
+      box.appendChild(row);
+      if (!r.ok) { const e = document.createElement('div'); e.className = 't-err'; e.textContent = r.error; box.appendChild(e); }
+    }
+    document.body.dataset.done = '1';
+  </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "_instructions": "무료 공식 API가 없는 데이터(ISM PMI, Forward EPS, Forward PER)를 직접 기입하는 파일입니다. 임의로 추정한 값을 넣지 마세요. 값이 없으면 해당 지표는 DATA_UNAVAILABLE 이며 0점으로 대체되지 않습니다. 대시보드의 '수동 데이터 입력' 폼(브라우저 localStorage)으로도 입력할 수 있습니다.",
+  "_example": {
+    "ISM_MFG": [{ "date": "2026-09-01", "value": 0, "source": "ISM (Institute for Supply Management)", "release_date": "2026-10-01", "period": "2026-09" }],
+    "FWD_EPS": [{ "date": "2026-09-25", "value": 0, "source": "예: FactSet Earnings Insight", "release_date": "2026-09-26", "period": "NTM" }],
+    "FWD_PE": [{ "date": "2026-09-25", "value": 0, "source": "예: FactSet Earnings Insight", "release_date": "2026-09-26", "period": "NTM" }],
+    "peBench": { "avg5y": 0, "avg10y": 0, "high52w": 0, "low52w": 0, "as_of": "2026-09-25", "source": "예: FactSet" }
+  },
+  "ISM_MFG": [],
+  "ISM_SVC": [],
+  "FWD_EPS": [],
+  "FWD_PE": [],
+  "peBench": null
+}

@@ -1,0 +1,7 @@
+{
+  "fetched_at": "2026-10-01T00:00:00Z",
+  "fetched_by": "agent session (FRED fredgraph.csv, 23 series 전체 재다운로드)",
+  "changed": ["all"],
+  "failed": [],
+  "note": "data/raw/*.csv 는 FRED 공개 CSV 스냅샷입니다. 갱신: scripts/update-data.mjs 실행 또는 .github/workflows/update-data.yml (GitHub Actions, 4시간마다)"
+}

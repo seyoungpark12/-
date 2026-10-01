@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>백테스트 · US Market Macro Signal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+</head>
+<body>
+  <header class="topbar"><span class="brand">📈 US MARKET MACRO SIGNAL</span>
+    <nav aria-label="주요 메뉴"><a href="index.html">대시보드</a><a href="backtest.html" class="active">백테스트</a><a href="tests.html">테스트</a></nav></header>
+  <main class="page">
+    <h1 style="font-size:24px">백테스트 — 과거 국면에서의 점수 흐름</h1>
+    <p class="muted" style="max-width:880px">목적은 "수익률이 가장 높은 전략" 찾기가 아닙니다. ① 급락 초기에 너무 빨리 매수 단계가 되는지 ② 바닥 근처에서 점수가 실제로 개선되는지 ③ 회복 후 너무 늦게 신호가 나오는지 ④ 신용위기에서 안전장치가 작동하는지 ⑤ 4단계 신호가 시장 국면과 어느 정도 일치하는지를 확인해 <b>임계값·가중치(config)</b>를 조정하기 위한 도구입니다. 각 시점은 <b>그 시점에 이미 발표된 데이터만</b> 사용합니다(point-in-time, 월간 지표는 발표 지연 반영).</p>
+
+    <div class="panel" style="margin-top:14px">
+      <div class="bt-controls">
+        <div><label for="sel-start">리플레이 시작일</label><select id="sel-start" style="width:100%"><option value="2001-01-02">2001-01-02 (전체, 느림)</option><option value="2007-01-02" selected>2007-01-02 (2008 금융위기 포함)</option><option value="2015-01-02">2015-01-02</option></select></div>
+        <div><label for="sel-step">평가 간격</label><select id="sel-step" style="width:100%"><option value="1">매 거래일 (매우 느림)</option><option value="2">2거래일</option><option value="3" selected>3거래일</option><option value="5">5거래일 (빠름)</option></select></div>
+        <div><button class="btn primary" id="btn-run" type="button" style="width:100%">백테스트 실행</button></div>
+      </div>
+      <div id="bt-progress" class="progress" hidden><div></div></div>
+      <div id="bt-status" class="muted small" style="margin-top:8px"></div>
+    </div>
+
+    <details class="cfg-box">
+      <summary>⚙ 파라미터 오버라이드 (config 의 일부 값만 JSON 으로 덮어쓰기)</summary>
+      <p class="muted small">예: <code>{"weights":{"vix":2},"priceGate":{"enabled":false},"phases":[...]}</code> 처럼 바꾸고 싶은 키만 작성하세요. 브라우저(localStorage)에만 저장되며 대시보드에도 동일하게 적용됩니다. 영구 반영은 <code>src/config.js</code> 를 수정하세요. (배열은 통째로 교체됩니다)</p>
+      <textarea id="cfg-text" class="cfg" spellcheck="false" aria-label="파라미터 오버라이드 JSON"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px"><button class="btn primary" id="btn-apply" type="button">적용 후 재실행</button><button class="btn danger" id="btn-reset" type="button">기본값으로 초기화</button></div>
+      <details style="margin-top:10px"><summary class="muted small" style="cursor:pointer">현재 기본값 일부 보기</summary><pre id="cfg-defaults" class="small muted" style="white-space:pre-wrap;max-height:280px;overflow:auto"></pre></details>
+    </details>
+
+    <div id="loading" class="loading-box"><div class="spinner"></div>데이터 로딩 중…</div>
+    <div id="app" hidden>
+      <div class="hero-status info" style="margin-top:14px">ⓘ <b>데이터 한계</b>: FRED 무료 데이터는 S&amp;P 500 일별 지수가 최근 10년(2016-10~), ICE HY OAS 가 최근 3년뿐입니다. 그 이전 구간은 <b>Nasdaq 100 가격</b>과 <b>Moody's Baa−10Y 스프레드(HY 프록시)</b>로 대체했고, ISM·Forward EPS·Forward PER 은 과거 이력이 없어 <b>결측(DATA_UNAVAILABLE)</b> 입니다(PMI 는 지역 연은 서베이 프록시). 따라서 과거 점수의 최대 범위는 ±16 이하이며 신뢰도는 대체로 MEDIUM 이하입니다. 결과 해석 시 유의하세요.</div>
+      <div id="bt-out"></div>
+      <p class="disclaimer" id="disclaimer"></p>
+    </div>
+  </main>
+  <script type="module">
+    import { DISCLAIMER } from './src/dashboard/ui.js';
+    document.getElementById('disclaimer').textContent = DISCLAIMER;
+  </script>
+  <script type="module" src="src/backtest/main.js"></script>
+</body>
+</html>

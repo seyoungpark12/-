@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>US Market Macro Signal · 미국 지수 거시 매수 타이밍 시스템</title>
+  <meta name="description" content="S&P 500 / Nasdaq 100 거시환경을 10개 지표(-2~+2)로 평가하는 규칙 기반 모니터링 대시보드">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+</head>
+<body>
+  <header class="topbar"><span class="brand">📈 US MARKET MACRO SIGNAL</span>
+    <nav aria-label="주요 메뉴"><a href="#hero" class="active">대시보드</a><a href="#indicator-section">지표</a><a href="#chart-section">차트</a><a href="#alloc-section">투자금 분할</a><a href="#manual-section">수동 입력</a><a href="backtest.html">백테스트</a><a href="tests.html">테스트</a></nav></header>
+
+  <main class="page">
+    <div id="loading" class="loading-box"><div class="spinner"></div>FRED 데이터 스냅샷을 불러와 점수를 계산하는 중…</div>
+    <div id="app" hidden>
+      <div id="cfg-note" class="hero-status cap" hidden style="margin-bottom:12px">⚙ 사용자 파라미터 오버라이드가 적용 중입니다 (백테스트 페이지에서 변경/초기화).</div>
+      <div id="update-bar" class="update-bar">
+        <div id="update-status" class="small muted" role="status" aria-live="polite"></div>
+        <button id="btn-update" class="btn primary" type="button">🔄 데이터 업데이트</button>
+      </div>
+      <section id="hero" class="hero" aria-label="시장 상태 요약"></section>
+
+      <section id="qa-section" class="section" aria-labelledby="qa-title">
+        <div class="section-head"><h2 id="qa-title">오늘의 5가지 질문</h2><span class="muted small">규칙 기반 템플릿 문장 · LLM 이 점수를 결정하지 않음</span>
+          <span style="margin-left:auto;display:flex;gap:6px"><button class="btn small" id="btn-copy-json" type="button">결과 JSON 복사</button><button class="btn small" id="btn-export-tables" type="button">테이블 JSON 내보내기</button></span></div>
+        <div id="qa" class="qa-grid"></div>
+      </section>
+
+      <section id="indicator-section" class="section" aria-labelledby="ind-title">
+        <div class="section-head"><h2 id="ind-title">10개 거시 지표</h2><span class="muted small">카드를 클릭하면 현재값·이전값·변화·점수 이유·기준일·출처를 볼 수 있습니다</span></div>
+        <div id="cards" class="cards"></div>
+      </section>
+
+      <section id="alert-section" class="section" aria-labelledby="alert-title">
+        <div class="section-head"><h2 id="alert-title">단계 진입 알림</h2><span class="muted small">신뢰도 LOW 이거나 가격/위험 필터로 상승이 억제되면 발생하지 않음</span></div>
+        <div id="alert-panel" class="panel"></div>
+      </section>
+
+      <section id="chart-section" class="section" aria-labelledby="chart-title">
+        <div class="section-head"><h2 id="chart-title">차트</h2><span id="hist-note" class="muted small"></span></div>
+        <div id="hist-progress" class="progress" hidden><div></div></div>
+        <div class="chart-toolbar"><span class="muted small">표시 기간</span>
+          <button class="btn small" data-range="1" type="button">1Y</button><button class="btn small" data-range="3" type="button">3Y</button><button class="btn small primary" data-range="5" type="button">5Y</button><button class="btn small" data-range="0" type="button">전체</button></div>
+        <div class="chart-grid">
+          <div class="chart-card wide"><h3>① S&amp;P 500 가격 + 이동평균</h3><div class="desc">200일선(주황) 위/아래 위치로 추세 확인</div><div id="chart-sp" class="chart tall"></div></div>
+          <div class="chart-card wide"><h3>② S&amp;P 500 Drawdown (252거래일 고점 대비)</h3><div class="desc">점선: -5% / -10% / -15% / -20% — 구간 자체는 매수 신호가 아님</div><div id="chart-dd" class="chart"></div></div>
+          <div class="chart-card wide"><h3>③ 거시 종합점수 변화</h3><div class="desc">-20 ~ +20 · 점선: 단계 경계(6/11/16) · 🔔 알림 발생 시점 (과거 시점은 해당 시점에 발표된 데이터만 사용)</div><div id="chart-score" class="chart"></div></div>
+          <div class="chart-card wide"><h3>④ 10개 지표별 점수 변화</h3><div class="desc">행: 지표 / 열: 날짜 / 색: 점수. 회색 없는 빈 칸은 데이터 없음(DATA_UNAVAILABLE)</div><div id="chart-heat" class="chart tall"></div></div>
+          <div class="chart-card"><h3>⑤ 미국 10년물 금리</h3><div class="desc">FRED DGS10</div><div id="chart-y10" class="chart"></div></div>
+          <div class="chart-card"><h3>⑥ VIX</h3><div class="desc">25 / 30 기준선</div><div id="chart-vix" class="chart"></div></div>
+          <div class="chart-card wide"><h3>⑦ High Yield Spread</h3><div class="desc">ICE BofA HY OAS (FRED 는 최근 3년 제공) · 점선: Baa−10Y 스프레드(장기 프록시)</div><div id="chart-hy" class="chart"></div></div>
+        </div>
+      </section>
+
+      <section id="alloc-section" class="section" aria-labelledby="alloc-title">
+        <div class="section-head"><h2 id="alloc-title">투자금 분할 (예시)</h2><span class="muted small">기본 예시 배분 · 자동 주문 없음</span></div>
+        <div id="alloc" class="panel"></div>
+      </section>
+
+      <section id="manual-section" class="section" aria-labelledby="manual-title">
+        <div class="section-head"><h2 id="manual-title">수동 데이터 입력</h2><span class="muted small">ISM PMI · Forward EPS · Forward PER</span></div>
+        <div id="manual" class="panel"></div>
+      </section>
+
+      <section id="data-section" class="section" aria-labelledby="data-title">
+        <div class="section-head"><h2 id="data-title">데이터 현황 · 출처</h2></div>
+        <div id="data-status" class="panel"></div>
+      </section>
+
+      <p class="disclaimer" id="disclaimer"></p>
+    </div>
+  </main>
+
+  <dialog id="modal" class="modal" aria-label="지표 상세"></dialog>
+  <script type="module">
+    import { DISCLAIMER } from './src/dashboard/ui.js';
+    document.getElementById('disclaimer').textContent = DISCLAIMER;
+  </script>
+  <script type="module" src="src/dashboard/main.js"></script>
+</body>
+</html>
