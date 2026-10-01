@@ -1,4 +1,4 @@
 {
-  "remoteBase": "",
+  "remoteBase": "https://raw.githubusercontent.com/seyoungpark12/-/main/",
   "_note": "자동 갱신 데이터 소스. 비워 두면 배포에 포함된 data/raw 스냅샷만 읽습니다. GitHub 저장소를 연결했다면 'https://raw.githubusercontent.com/<계정>/<저장소>/main/' (끝에 / 포함) 형태로 채우세요. 사이트는 remoteBase + 'data/raw/<SERIES>.csv' 를 읽고, 실패하거나 배포본보다 오래된 경우 배포본을 사용합니다."
 }
