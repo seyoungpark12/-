@@ -1,8 +1,8 @@
 {
-  "fetched_at": "2026-10-07T04:10:20.024Z",
+  "fetched_at": "2026-10-07T16:13:17.810Z",
   "fetched_by": "scripts/update-data.mjs (FRED fredgraph.csv)",
   "changed": [
-    "NASDAQ100"
+    "VIXCLS"
   ],
   "failed": [],
   "note": "data/raw/*.csv 는 FRED 공개 CSV 스냅샷입니다."
