@@ -25,9 +25,9 @@ for (const [file, [id, start]] of Object.entries(SERIES)) {
   const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}&cosd=${start}`;
   const path = join(root, 'data/raw', file);
   try {
-    const res = await fetch(url);
-    signal: AbortSignal.timeout(15000),
-    headers: { 'User-Agent': 'Mozilla/5.0 (data-bot)' },
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(15000),
+      headers: { 'User-Agent': 'Mozilla/5.0 (data-bot)' },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
