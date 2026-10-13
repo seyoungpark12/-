@@ -26,6 +26,9 @@ for (const [file, [id, start]] of Object.entries(SERIES)) {
   const path = join(root, 'data/raw', file);
   try {
     const res = await fetch(url);
+    signal: AbortSignal.timeout(15000),
+    headers: { 'User-Agent': 'Mozilla/5.0 (data-bot)' },
+    });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
     if (!/^observation_date|^DATE/i.test(text) || text.split('\n').length < 10) throw new Error('unexpected content');
@@ -33,7 +36,8 @@ for (const [file, [id, start]] of Object.entries(SERIES)) {
     if (old !== text) { await writeFile(path, text); changed.push(id); console.log('UPD ', id); }
     else console.log('same', id);
   } catch (e) {
-    failed.push(id); console.error('FAIL', id, String(e));
+    failed.push(id);
+    console.error('FAIL', id, e.message, e.cause?.code ?? e.cause ?? '');
   }
 }
 if (changed.length || failed.length) {
