@@ -1,14 +1,8 @@
 {
-  "fetched_at": "2026-11-06T00:43:42.175Z",
+  "fetched_at": "2026-11-06T11:47:05.778Z",
   "fetched_by": "scripts/update-data.mjs (FRED fredgraph.csv)",
   "changed": [
-    "DGS10",
-    "DFII10",
-    "DGS6MO",
-    "DGS1",
-    "DGS2",
-    "DFF",
-    "BAA10Y"
+    "NASDAQ100"
   ],
   "failed": [],
   "note": "data/raw/*.csv 는 FRED 공개 CSV 스냅샷입니다."
